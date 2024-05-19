@@ -1,4 +1,4 @@
-package org.taohansen.sittermanager.services;
+package org.taohansen.sittermanager.services.exceptions;
 
 public class ResourceNotFoundException extends RuntimeException {
     public ResourceNotFoundException(String msg) {
