@@ -48,8 +48,12 @@ public class UserService {
         copyDtoToEntity(dto, entity);
 
         for (RoleDTO roleDTO : dto.getRoles()) {
-            Role role = roleRepository.findByAuthority(roleDTO.getAuthority());
-            entity.getRoles().add(role);
+            Optional role = roleRepository.findById(roleDTO.getId());
+            if (role.isPresent()) {
+                entity.getRoles().add((Role) role.get());
+            } else {
+                throw new ResourceNotFoundException("Role ID " + roleDTO.getId() + " not found");
+            }
         }
 
         entity = repository.save(entity);
@@ -83,7 +87,6 @@ public class UserService {
     private void copyDtoToEntity(UserDTO dto, User entity) {
         entity.setUsername(dto.getUsername());
         entity.setEmail(dto.getEmail());
-
         entity.getRoles().clear();
         for(RoleDTO roleDTO : dto.getRoles()){
             Role role = roleRepository.getReferenceById(roleDTO.getId());

@@ -1,14 +1,11 @@
-package org.taohansen.sittermanager.entities;
+package org.taohansen.sittermanager.dtos;
 
-import jakarta.persistence.*;
+import org.taohansen.sittermanager.entities.Babysitter;
 
 import java.time.LocalDate;
 import java.util.Objects;
 
-@MappedSuperclass
-public class Employee {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class BabySitterDTO {
     private Long id;
     private String name;
     private String cpf;
@@ -19,18 +16,25 @@ public class Employee {
     private Integer weeklyHours;
     private Double monthlySalary;
     private Double bonus;
+    private int yearsOfExperience;
+    private double maxTravelDistance;
 
-    public Employee() {
+    public BabySitterDTO() {
     }
 
-    public Employee(Long id, String name, String cpf, LocalDate dateOfBirth, String address, String phoneNumber, String email) {
-        this.id = id;
-        this.name = name;
-        this.cpf = cpf;
-        this.dateOfBirth = dateOfBirth;
-        this.address = address;
-        this.phoneNumber = phoneNumber;
-        this.email = email;
+    public BabySitterDTO(Babysitter entity) {
+        id = entity.getId();
+        name = entity.getName();
+        cpf = entity.getCpf();
+        dateOfBirth = entity.getDateOfBirth();
+        address = entity.getAddress();
+        phoneNumber = entity.getPhoneNumber();
+        email = entity.getEmail();
+        weeklyHours = entity.getWeeklyHours();
+        monthlySalary = entity.getMonthlySalary();
+        bonus = entity.getBonus();
+        yearsOfExperience = entity.getYearsOfExperience();
+        maxTravelDistance = entity.getMaxTravelDistance();
     }
 
     public Long getId() {
@@ -113,12 +117,28 @@ public class Employee {
         this.bonus = bonus;
     }
 
+    public int getYearsOfExperience() {
+        return yearsOfExperience;
+    }
+
+    public void setYearsOfExperience(int yearsOfExperience) {
+        this.yearsOfExperience = yearsOfExperience;
+    }
+
+    public double getMaxTravelDistance() {
+        return maxTravelDistance;
+    }
+
+    public void setMaxTravelDistance(double maxTravelDistance) {
+        this.maxTravelDistance = maxTravelDistance;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Employee employee = (Employee) o;
-        return Objects.equals(cpf, employee.cpf);
+        BabySitterDTO that = (BabySitterDTO) o;
+        return Objects.equals(cpf, that.cpf);
     }
 
     @Override
