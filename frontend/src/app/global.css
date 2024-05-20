@@ -1,0 +1,26 @@
+.profile-container {
+    width: 100%;
+    max-width: 1180px;
+    padding: 0 30px;
+    margin: 32px auto;
+}
+
+.profile-container h1{
+    margin-top: 80px;
+    margin-bottom: 24px;
+}
+
+.profile-container ul {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /*ou repeat(2,1fr) mesmo resultado*/
+    grid-gap: 24px;
+    list-style: none;
+}
+
+.profile-container ul li {
+    background: #fff;
+    color: #333;
+    padding: 24px; /*ou repeat(2,1fr) mesmo resultado*/
+    border-radius: 8px;
+    position: relative;
+}
