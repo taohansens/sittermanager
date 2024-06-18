@@ -10,27 +10,29 @@ public class Employee {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String name;
     private String cpf;
+    private String fullName;
     private LocalDate dateOfBirth;
     private String address;
     private String phoneNumber;
-    private String email;
     private Integer weeklyHours;
     private Double monthlySalary;
     private Double bonus;
 
+    @OneToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
     public Employee() {
     }
 
-    public Employee(Long id, String name, String cpf, LocalDate dateOfBirth, String address, String phoneNumber, String email) {
+    public Employee(Long id, String fullName, String cpf, LocalDate dateOfBirth, String address, String phoneNumber) {
         this.id = id;
-        this.name = name;
+        this.fullName = fullName;
         this.cpf = cpf;
         this.dateOfBirth = dateOfBirth;
         this.address = address;
         this.phoneNumber = phoneNumber;
-        this.email = email;
     }
 
     public Long getId() {
@@ -41,12 +43,12 @@ public class Employee {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getFullName() {
+        return fullName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 
     public String getCpf() {
@@ -79,14 +81,6 @@ public class Employee {
 
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
     }
 
     public Integer getWeeklyHours() {

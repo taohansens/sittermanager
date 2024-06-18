@@ -13,12 +13,6 @@ public class Babysitter extends Employee {
 
     public Babysitter() {
     }
-
-    public Babysitter(Long id, String name, String cpf, LocalDate dateOfBirth, String address, String phoneNumber, String email, int yearsOfExperience) {
-        super(id, name, cpf, dateOfBirth, address, phoneNumber, email);
-        this.yearsOfExperience = yearsOfExperience;
-    }
-
     public int getYearsOfExperience() {
         return yearsOfExperience;
     }

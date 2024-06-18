@@ -5,12 +5,11 @@ import java.util.Objects;
 
 public class BabySitterDTO {
     private Long id;
-    private String name;
+    private String fullName;
     private String cpf;
     private LocalDate dateOfBirth;
     private String address;
     private String phoneNumber;
-    private String email;
     private Integer weeklyHours;
     private Double monthlySalary;
     private Double bonus;
@@ -28,12 +27,12 @@ public class BabySitterDTO {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getFullName() {
+        return fullName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 
     public String getCpf() {
@@ -66,14 +65,6 @@ public class BabySitterDTO {
 
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
     }
 
     public Integer getWeeklyHours() {
