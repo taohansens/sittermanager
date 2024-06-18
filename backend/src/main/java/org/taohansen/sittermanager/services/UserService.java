@@ -1,97 +1,54 @@
 package org.taohansen.sittermanager.services;
 
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import org.taohansen.sittermanager.dtos.UserDTO;
+import org.springframework.transaction.annotation.Transactional;
 import org.taohansen.sittermanager.dtos.RoleDTO;
+import org.taohansen.sittermanager.dtos.UserDTO;
 import org.taohansen.sittermanager.entities.Role;
 import org.taohansen.sittermanager.entities.User;
+import org.taohansen.sittermanager.projections.UserDetailsProjection;
 import org.taohansen.sittermanager.repositories.RoleRepository;
 import org.taohansen.sittermanager.repositories.UserRepository;
-import org.taohansen.sittermanager.services.exceptions.DatabaseException;
-import org.taohansen.sittermanager.services.exceptions.ResourceNotFoundException;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
+import java.util.List;
 
 @Service
-public class UserService {
+public class UserService implements UserDetailsService {
 
     @Autowired
     private UserRepository repository;
+
     @Autowired
     private RoleRepository roleRepository;
 
-    @Transactional(readOnly = true)
-    public Page<UserDTO> findAllPaged(Pageable pageable) {
-        Page<User> list = repository.findAll(pageable);
-        return list.map(UserDTO::new);
-    }
+    @Autowired
+    private AuthService authService;
 
     @Transactional(readOnly = true)
-    public UserDTO findById(Long id) {
-        Optional<User> obj = repository.findById(id);
-        User entity = obj.orElseThrow(() -> new ResourceNotFoundException("Entity User not found."));
+    public UserDTO findMe() {
+        User entity = authService.authenticated();
         return new UserDTO(entity);
     }
 
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-    @Transactional
-    public UserDTO insert(UserDTO dto) {
-        User entity = new User();
-        copyDtoToEntity(dto, entity);
-
-        for (RoleDTO roleDTO : dto.getRoles()) {
-            Optional role = roleRepository.findById(roleDTO.getId());
-            if (role.isPresent()) {
-                entity.getRoles().add((Role) role.get());
-            } else {
-                throw new ResourceNotFoundException("Role ID " + roleDTO.getId() + " not found");
-            }
+        List<UserDetailsProjection> result = repository.searchUserAndRolesByEmail(username);
+        if (result.size() == 0) {
+            throw new UsernameNotFoundException("Email not found");
         }
 
-        entity = repository.save(entity);
-        return new UserDTO(entity);
+        User user = new User();
+        user.setEmail(result.get(0).getUsername());
+        user.setPassword(result.get(0).getPassword());
+        for (UserDetailsProjection projection : result) {
+            user.addRole(new Role(projection.getRoleId(), projection.getAuthority()));
+        }
+
+        return user;
     }
-
-    @Transactional
-    public UserDTO update(Long id, UserDTO dto) {
-        try {
-            User entity = repository.getReferenceById(id);
-            copyDtoToEntity(dto, entity);
-            entity = repository.save(entity);
-            return new UserDTO(entity);
-        } catch (EntityNotFoundException e) {
-            throw new ResourceNotFoundException("User ID " + id + " not found");
-        }
-    }
-
-    @Transactional(propagation = Propagation.SUPPORTS)
-    public void delete(Long id) {
-        if (!repository.existsById(id)) {
-            throw new ResourceNotFoundException("User id (" + id + ") not found.");
-        }
-        try {
-            repository.deleteById(id);
-        } catch (DataIntegrityViolationException e) {
-            throw new DatabaseException("Database Integrity Violation");
-        }
-    }
-
-    private void copyDtoToEntity(UserDTO dto, User entity) {
-        entity.setUsername(dto.getUsername());
-        entity.setEmail(dto.getEmail());
-        entity.getRoles().clear();
-        for(RoleDTO roleDTO : dto.getRoles()){
-            Role role = roleRepository.getReferenceById(roleDTO.getId());
-            entity.getRoles().add(role);
-        }
-    }
-
 }

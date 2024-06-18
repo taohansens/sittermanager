@@ -1,7 +1,5 @@
 package org.taohansen.sittermanager.dtos;
 
-import org.taohansen.sittermanager.entities.Babysitter;
-
 import java.time.LocalDate;
 import java.util.Objects;
 
@@ -20,21 +18,6 @@ public class BabySitterDTO {
     private double maxTravelDistance;
 
     public BabySitterDTO() {
-    }
-
-    public BabySitterDTO(Babysitter entity) {
-        id = entity.getId();
-        name = entity.getName();
-        cpf = entity.getCpf();
-        dateOfBirth = entity.getDateOfBirth();
-        address = entity.getAddress();
-        phoneNumber = entity.getPhoneNumber();
-        email = entity.getEmail();
-        weeklyHours = entity.getWeeklyHours();
-        monthlySalary = entity.getMonthlySalary();
-        bonus = entity.getBonus();
-        yearsOfExperience = entity.getYearsOfExperience();
-        maxTravelDistance = entity.getMaxTravelDistance();
     }
 
     public Long getId() {
