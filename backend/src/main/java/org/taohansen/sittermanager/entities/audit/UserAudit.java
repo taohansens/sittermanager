@@ -11,10 +11,13 @@ public class UserAudit implements AuditInterface {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private Long entityId;
+    @Enumerated(EnumType.STRING)
     private AuditAction action;
     private String executedBy;
     private LocalDateTime timestamp;
+    @Lob
     private String oldValue;
+    @Lob
     private String newValue;
     private String description;
 

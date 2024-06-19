@@ -1,5 +1,7 @@
 package org.taohansen.sittermanager.services;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -33,6 +35,9 @@ public class BabysitterService {
     @Autowired
     private AuditUtil auditUtil;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     @Transactional(readOnly = true)
     public Page<BabySitterDTO> findAllPaged(Pageable pageable) {
         Page<Babysitter> list = repository.findAll(pageable);
@@ -62,20 +67,38 @@ public class BabysitterService {
         entity = repository.save(entity);
 
         String me = authService.authenticated().getId().toString();
-        auditUtil.auditChange(BabysitterAudit.class, entity.getId(),
-                AuditAction.POST, me, "Insert", null, entity.toString());
+
+        try {
+            auditUtil.auditChange(BabysitterAudit.class, entity.getId(),
+                    AuditAction.POST, me, "Insert", null, objectMapper.writeValueAsString(entity));
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
 
         return BabysitterMapper.INSTANCE.toDto(entity);
     }
 
     @Transactional
     public BabySitterDTO update(Long id, BabySitterDTO dto) {
+        String me = authService.authenticated().getId().toString();
+        Babysitter entity = null;
         try {
-            Babysitter entity = BabysitterMapper.INSTANCE.toEntity(dto);
+            entity = repository.getReferenceById(id);
+            String oldEntity = objectMapper.writeValueAsString(entity);
+            entity = BabysitterMapper.INSTANCE.toEntity(dto);
             entity = repository.save(entity);
+
+            auditUtil.auditChange(BabysitterAudit.class, entity.getId(),
+                    AuditAction.PUT, me, "Update entity", oldEntity, objectMapper.writeValueAsString(entity));
+
             return BabysitterMapper.INSTANCE.toDto(entity);
+
         } catch (EntityNotFoundException e) {
-            throw new ResourceNotFoundException("Babysitter ID " + id + " not found");
+            throw new ResourceNotFoundException("Id " + id + " not found");
+        } catch (JsonProcessingException e) {
+            auditUtil.auditChange(BabysitterAudit.class, id,
+                    AuditAction.PUT, me, "Insert Ok, Error Json Serialize", null, null);
+            return BabysitterMapper.INSTANCE.toDto(entity);
         }
     }
 

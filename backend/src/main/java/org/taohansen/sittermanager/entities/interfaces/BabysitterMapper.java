@@ -8,6 +8,7 @@ import org.taohansen.sittermanager.entities.Babysitter;
 
 @Mapper
 public interface BabysitterMapper {
+
     BabysitterMapper INSTANCE = Mappers.getMapper(BabysitterMapper.class);
     @Mapping(source = "dto.fullName", target = "fullName")
     @Mapping(source = "dto.cpf", target = "cpf")
